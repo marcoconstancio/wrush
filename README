@@ -11,13 +11,13 @@ Requirements
 - php-cli with zip and curl extensions activated
 
 Instalation:
-=============
+============
 1. if your php executable is no /usr/bin/php modify the first line of the script to match you location. OPTIONAL: modify the variables in the beginning of the file that you feel might necessary (like web_user or web_group)
 2. copy the script to /usr/bin
 3. make executable with the command: chmod +x /usr/bin/wrush
 
 Notes:
-=============	
+======	
 * Parameters with a asterisk (*) are mandatory.	
 * Wrush will display the available options when the required section/action/parameters are not specified.
 * With the exception of the action dl (core section), all commands must be run on the root of the wordpress installation folder.
@@ -25,10 +25,13 @@ Notes:
 * The 'perm' action (utils section) sets folder/file permissions for the wordpress installation, but because of php requirements the user running the script must be root (or a user running sudo). 
 
 Instructions
-=============
-	wrush <section> <action> <parameter 1>,....<parameter n>
+============
+	
+wrush <section> <action> <parameter 1>,....<parameter n>
 
-### Available sections:
+Available sections:
+-------------------
+
 * core 
 * user
 * theme 
@@ -38,345 +41,353 @@ Instructions
 * category
 * utils 
 		
-### Available actions (core section):
+Available actions (core section):
+---------------------------------
 
-	dl - downloads wordpress installation to current directory. When no version is specified the program will delete the most recent version. requires write permissions on the current folder.
-	
-		PARAMETERS:
-			<version> - version of the wordpress installation
-		USAGE: 
-			wrush core dl
-			wrush core dl 3.1.2
+dl - downloads wordpress installation to current directory. When no version is specified the program will delete the most recent version. requires write permissions on the current folder.
 
-	dbname - sets a new database name in the wordpress config file
-	
-		USAGE:
-			wrush core dbname rand_wp_database
+	PARAMETERS:
+		<version> - version of the wordpress installation
+	USAGE: 
+		wrush core dl
+		wrush core dl 3.1.2
 
-	dbhost - sets a new database hostname in the wordpress config file
-	
-		USAGE:
-			wrush core dbhost 192.168.1.1
-	
-	dbuser - sets a new database user in the wordpress config file
-	
-		USAGE: 
-			wrush core dbuser user123
-	
-	dbpass - sets a new database user password in the wordpress config file
-	
-		USAGE: 
-			wrush core dbpass pass123
-	
-	db - sets the database name, hostname, user and user password. Parameters must be specified in this order
-	
-		USAGE: 
-			wrush core rand_wp_database, 192.168.1.1, user123, pass123
-				
-				
-### Available actions (user section):
+dbname - sets a new database name in the wordpress config file
 
-	create - creates a user 
-	
-		PARAMETERS:
-			<*username> - username of the user
-			<*password> - password of the user
-			<*email> - email of the user
-			<role> - role of the user, default is none, available roles are: administrator, editor, author, contributor, subscriber
-			<first name> - first name of the user
-			<last name> - last name of user
-		USAGE: 
-			wrush user create user123, pass123, email123@email.com
-			wrush user create user456, pass456, email456@email.com, administrator, User456FirstNamae, User456LastName		
-	
-	list - shows a list of all users
-	
-		USAGE: 
-			wrush user list
-	
-	info - show sinformation of a specific user
-	
-		PARAMETERS:
-			<*username/slug (nice name)/id/email> - a user's username, id, slug or email
-		USAGE: 
-			wrush user info user123
-			wrush user info email123@email.com
-	
-	delete - deletes a specific user
-	
-		PARAMETERS:
-			<*username/slug (nice name)/id/email> - a user's username, id, slug or email
-		USAGE: 
-			wrush user delete user123
-			wrush user delete email123@email.com
-	
-	update - udpates the information of a specific user
-	
-		PARAMETERS:
-			<*username/slug (nice name)/id/email> - a user's username, id, slug or email
-			<*name 1>=<*value 1> - at least a parameter must be specified. 
-		USAGE: 
-			wrush user update user123, nickname=user123, role=editor, user_pass=password123
-			wrush user update email123@email.com, first_name=firstname123, display_name=displayname123
+	USAGE:
+		wrush core dbname rand_wp_database
 
+dbhost - sets a new database hostname in the wordpress config file
 
-### Available actions (page section):
+	USAGE:
+		wrush core dbhost 192.168.1.1
 
-	create - creates a page
-	
-		PARAMETERS:
-			<*title> - title of the page
-			<content> - content of page
-			<status> - status of the page, available status are draft, publish, pending, future and private
-			<author id/name/slug (nice name)/email> - a user's username, id, slug or email
-		USAGE: 
-			wrush page create test page title, test page content, publish, user123	
-	
-	list - shows a list of all pages
-	
-		USAGE: 
-			wrush page list
-	
-	info - shows information of a specific page
-	
-		PARAMETERS:
-			<*page title/slug (nice name)/id> - a page title, slug or id
-		USAGE: 
-			wrush page info test page title
-	
-	update - changes data from a specified page
-	
-		PARAMETERS:
-			<*page title/slug (nice name)/id> - a page title, slug or id
-			<*name 1>=<*value 1> - at least a parameter must be specified 
-		USAGE: 
-			wrush page update test page title, post_content=this a new content for tha page, post_status=draft, post_author=admin
-	
-	delete - deletes a specified page
-	
-		PARAMETERS:
-			<*page title/slug (nice name)/id> - a page title, slug or id
-		USAGE: 
-			wrush page delete test page title
-	
-	emptytrash - deletes all pages from the trash 
-	
-		USAGE: 
-			wrush page emptytrash	
+dbuser - sets a new database user in the wordpress config file
 
+	USAGE: 
+		wrush core dbuser user123
 
-### Available actions (post section):
-	
-	create - creates a post
-	
-		PARAMETERS:
-			<*title> - title of the post
-			<content> - content of post
-			<status> - status of the post, available status are draft, publish, pending, future and private
-			<author id/name/slug (nice name)/email> - a user's username, id, slug or email
-		USAGE: 
-			wrush post create test post title, test post content, publish, user123	
-	
-	list - shows a list of all posts
-	
-		USAGE: 
-			wrush post list
-	
-	info - shows information of a specific post
-	
-		PARAMETERS:
-			<*post title/slug (nice name)/id> - a post title, slug or id
-		USAGE: 
-			wrush post info test post title
-	
-	update - changes data from a specified post
-	
-		PARAMETERS:
-			<*post title/slug (nice name)/id> - a post title, slug or id
-			<*name 1>=<*value 1> - at least a parameter must be specified 
-		USAGE: 
-			wrush post update test post title, post_content=this a new content for tha post, post_status=draft, post_author=admin
-	
-	delete - deletes a specified post
-	
-		PARAMETERS:
-			<*post title/slug (nice name)/id> - a post title, slug or id
-		USAGE: 
-			wrush post delete test post title
-	
-	emptytrash - deletes all pages from the trash 
-	
-		USAGE: 
-			wrush post emptytrash
-	
-	
-### Available actions (category section):
-	
-	create - create a category
-	
-		PARAMETERS:
-			<*category name> - a name for the category
-			<category description> - description of the category
-			<category slug (nice name)> -  a category slug 
-			<category parent name/id> - id or name of the parent category
-		USAGE: 
-			wrush category create new catagory 
-			wrush category create new catagory, a new category for wodpress, new-cat, uncategorized
-	
-	list - shows a list of all category
-	
-		USAGE: 
-			wrush category list
-	
-	info - shows information of a specific category
-	
-		PARAMETERS:
-			<*category name/slug (nice name)/id> - a category title, slug or id
-		USAGE: 
-			wrush category info uncategorized
-		
-	update - changes data from a specified category
-	
-		PARAMETERS:
-			<*category name/slug (nice name)/id>, - a category title, slug or id
-			<*name 1>=<*value 1> - at least a parameter must be specified 
-		USAGE: 
-			wrush category update uncategorized, category_description=this a category for posts and pages without a specific category, category_nicename=no-cat
+dbpass - sets a new database user password in the wordpress config file
+
+	USAGE: 
+		wrush core dbpass pass123
+
+db - sets the database name, hostname, user and user password. Parameters must be specified in this order
+
+	USAGE: 
+		wrush core rand_wp_database, 192.168.1.1, user123, pass123
 			
-	delete - deletes a specific category
+			
+Available actions (user section):
+---------------------------------
 	
-		PARAMETERS:
-			<*category slug/id> - a category slug or or id
-		USAGE: 
-			wrush category delete new-cat
+create - creates a user 
+
+	PARAMETERS:
+		<*username> - username of the user
+		<*password> - password of the user
+		<*email> - email of the user
+		<role> - role of the user, default is none, available roles are: administrator, editor, author, contributor, subscriber
+		<first name> - first name of the user
+		<last name> - last name of user
+	USAGE: 
+		wrush user create user123, pass123, email123@email.com
+		wrush user create user456, pass456, email456@email.com, administrator, User456FirstNamae, User456LastName		
+
+list - shows a list of all users
+
+	USAGE: 
+		wrush user list
+
+info - show sinformation of a specific user
+
+	PARAMETERS:
+		<*username/slug (nice name)/id/email> - a user's username, id, slug or email
+	USAGE: 
+		wrush user info user123
+		wrush user info email123@email.com
+
+delete - deletes a specific user
+
+	PARAMETERS:
+		<*username/slug (nice name)/id/email> - a user's username, id, slug or email
+	USAGE: 
+		wrush user delete user123
+		wrush user delete email123@email.com
+
+update - udpates the information of a specific user
+
+	PARAMETERS:
+		<*username/slug (nice name)/id/email> - a user's username, id, slug or email
+		<*name 1>=<*value 1> - at least a parameter must be specified. 
+	USAGE: 
+		wrush user update user123, nickname=user123, role=editor, user_pass=password123
+		wrush user update email123@email.com, first_name=firstname123, display_name=displayname123
 
 
-### Available actions (theme section):
-	
-	list - list installed themes
-	
-		USAGE: 
-			wrush theme list
-	
-	info - shows information of a specific theme
-	
-		PARAMETERS:
-			<*theme title/name> - a theme title or name
-		USAGE: 
-			wrush theme info Twenty Ten
-	
-	install - donwloads and install the requested theme. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade' and 'wp-content/themes'. 
-	
-		PARAMETERS:
-			<*theme title/name> - a theme title or name
-		USAGE: 
-			wrush theme install WikiWP
-	
-	enable - enables the specified theme 
-	
-		PARAMETERS:
-			<*theme title/name> - a theme title or name
-		USAGE: 
-			wrush theme enable WikiWP
-	
-	delete- donwloads and install the requested theme. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/themes' and theme folder. 
-	
-		PARAMETERS:
-			<*theme title/name> - a theme title or name
-		USAGE: 
-			wrush theme delete WikiWP
-	
-	search - search a theme on wordpress.org
-	
-		PARAMETERS:
-			(*)term=<*term> - a search term
-			(*)tag=<*tag> - a tag to search, supports mutiples tags by using the plus sign.
-			(*)autho=<*author> - a theme author to be search
-		USAGE: 
-			wrush theme search term=wiki
-			wrush theme search tag=white + flexible-width + one-column
-			wrush theme search author=LifeIsSimple
-	
-	update - updates the specified theme to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/themes' and theme folder. 
-	
-		PARAMETERS:
-			<*theme title/name> - a theme title or name
-		USAGE: 
-			wrush theme update WikiWP
-	
-	updateall - updates all installed theme to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/themes' and all theme folders. 
-	
-		USAGE: 
-			wrush theme updateall
+Available actions (page section):
+---------------------------------
+
+create - creates a page
+
+	PARAMETERS:
+		<*title> - title of the page
+		<content> - content of page
+		<status> - status of the page, available status are draft, publish, pending, future and private
+		<author id/name/slug (nice name)/email> - a user's username, id, slug or email
+	USAGE: 
+		wrush page create test page title, test page content, publish, user123	
+
+list - shows a list of all pages
+
+	USAGE: 
+		wrush page list
+
+info - shows information of a specific page
+
+	PARAMETERS:
+		<*page title/slug (nice name)/id> - a page title, slug or id
+	USAGE: 
+		wrush page info test page title
+
+update - changes data from a specified page
+
+	PARAMETERS:
+		<*page title/slug (nice name)/id> - a page title, slug or id
+		<*name 1>=<*value 1> - at least a parameter must be specified 
+	USAGE: 
+		wrush page update test page title, post_content=this a new content for tha page, post_status=draft, post_author=admin
+
+delete - deletes a specified page
+
+	PARAMETERS:
+		<*page title/slug (nice name)/id> - a page title, slug or id
+	USAGE: 
+		wrush page delete test page title
+
+emptytrash - deletes all pages from the trash 
+
+	USAGE: 
+		wrush page emptytrash	
 
 
-### Available actions (plugin section):
+Available actions (post section):
+---------------------------------
 
-	list - list installed plugins
+create - creates a post
+
+	PARAMETERS:
+		<*title> - title of the post
+		<content> - content of post
+		<status> - status of the post, available status are draft, publish, pending, future and private
+		<author id/name/slug (nice name)/email> - a user's username, id, slug or email
+	USAGE: 
+		wrush post create test post title, test post content, publish, user123	
+
+list - shows a list of all posts
+
+	USAGE: 
+		wrush post list
+
+info - shows information of a specific post
+
+	PARAMETERS:
+		<*post title/slug (nice name)/id> - a post title, slug or id
+	USAGE: 
+		wrush post info test post title
+
+update - changes data from a specified post
+
+	PARAMETERS:
+		<*post title/slug (nice name)/id> - a post title, slug or id
+		<*name 1>=<*value 1> - at least a parameter must be specified 
+	USAGE: 
+		wrush post update test post title, post_content=this a new content for tha post, post_status=draft, post_author=admin
+
+delete - deletes a specified post
+
+	PARAMETERS:
+		<*post title/slug (nice name)/id> - a post title, slug or id
+	USAGE: 
+		wrush post delete test post title
+
+emptytrash - deletes all pages from the trash 
+
+	USAGE: 
+		wrush post emptytrash
 	
-		USAGE: 
-			wrush plugin list
 	
-	info - shows information of a specific plugin
+Available actions (category section):
+-------------------------------------
 	
-		PARAMETERS:
-			<*plugin title/name> - a plugin title or name
-		USAGE: 
-			wrush plugin info Akismet	
+create - create a category
+
+	PARAMETERS:
+		<*category name> - a name for the category
+		<category description> - description of the category
+		<category slug (nice name)> -  a category slug 
+		<category parent name/id> - id or name of the parent category
+	USAGE: 
+		wrush category create new catagory 
+		wrush category create new catagory, a new category for wodpress, new-cat, uncategorized
+
+list - shows a list of all category
+
+	USAGE: 
+		wrush category list
+
+info - shows information of a specific category
+
+	PARAMETERS:
+		<*category name/slug (nice name)/id> - a category title, slug or id
+	USAGE: 
+		wrush category info uncategorized
 	
-	search - search a plugin on wordpress.org
-	
-		PARAMETERS:
-			(*)term=<*term> - a search term
-			(*)tag=<*tag> - a tag to search, supports mutiples tags by using the plus sign.
-			(*)author=<*author> - a plugin author to be search
-		USAGE: 
-			wrush plugin search term=post archive
-			wrush plugin search tag=spam
-			wrush plugin search author=frank
-	
-	install - donwloads and install the requested plugin. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade' and 'wp-content/plugins'. 
-	
-		PARAMETERS:
-			<*plugin title/name> - a plugin title or name
-		USAGE: 
-			wrush plugin install spam free wordpress
-	
-	enable - enables the specified plugin 
-	
-		PARAMETERS:
-			<*plugin title/name> - a plugin title or name
-		USAGE: 
-			wrush plugin enable WikiWP
-	
-	disable - disables the specified plugin 
-	
-		PARAMETERS:
-			<*plugin title/name> - a plugin title or name
-		USAGE: 
-			wrush plugin disable spam free wordpress
-	
-	delete- donwloads and install the requested plugin. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/plugins' and plugin folder. 
-	
-		PARAMETERS:
-			<*plugin title/name> - a plugin title or name
-		USAGE: 
-			wrush plugin delete spam free wordpress
-	
-	update - updates the specified plugin to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/plugins' and plugin folder. 
-	
-		PARAMETERS:
-			<*plugin title/name> - a plugin title or name
-		USAGE: 
-			wrush plugin update spam free wordpress
-	
-	updateall - updates all installed plugin to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/plugins' and all plugin folders. 
-	
-		USAGE: 
-			wrush plugin updateall
+update - changes data from a specified category
+
+	PARAMETERS:
+		<*category name/slug (nice name)/id>, - a category title, slug or id
+		<*name 1>=<*value 1> - at least a parameter must be specified 
+	USAGE: 
+		wrush category update uncategorized, category_description=this a category for posts and pages without a specific category, category_nicename=no-cat
+		
+delete - deletes a specific category
+
+	PARAMETERS:
+		<*category slug/id> - a category slug or or id
+	USAGE: 
+		wrush category delete new-cat
 
 
-### Available actions (utils section): 
+Available actions (theme section):
+----------------------------------
+	
+list - list installed themes
+
+	USAGE: 
+		wrush theme list
+
+info - shows information of a specific theme
+
+	PARAMETERS:
+		<*theme title/name> - a theme title or name
+	USAGE: 
+		wrush theme info Twenty Ten
+
+install - donwloads and install the requested theme. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade' and 'wp-content/themes'. 
+
+	PARAMETERS:
+		<*theme title/name> - a theme title or name
+	USAGE: 
+		wrush theme install WikiWP
+
+enable - enables the specified theme 
+
+	PARAMETERS:
+		<*theme title/name> - a theme title or name
+	USAGE: 
+		wrush theme enable WikiWP
+
+delete- donwloads and install the requested theme. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/themes' and theme folder. 
+
+	PARAMETERS:
+		<*theme title/name> - a theme title or name
+	USAGE: 
+		wrush theme delete WikiWP
+
+search - search a theme on wordpress.org
+
+	PARAMETERS:
+		(*)term=<*term> - a search term
+		(*)tag=<*tag> - a tag to search, supports mutiples tags by using the plus sign.
+		(*)autho=<*author> - a theme author to be search
+	USAGE: 
+		wrush theme search term=wiki
+		wrush theme search tag=white + flexible-width + one-column
+		wrush theme search author=LifeIsSimple
+
+update - updates the specified theme to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/themes' and theme folder. 
+
+	PARAMETERS:
+		<*theme title/name> - a theme title or name
+	USAGE: 
+		wrush theme update WikiWP
+
+updateall - updates all installed theme to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/themes' and all theme folders. 
+
+	USAGE: 
+		wrush theme updateall
+
+
+Available actions (plugin section):
+-----------------------------------
+
+list - list installed plugins
+
+	USAGE: 
+		wrush plugin list
+
+info - shows information of a specific plugin
+
+	PARAMETERS:
+		<*plugin title/name> - a plugin title or name
+	USAGE: 
+		wrush plugin info Akismet	
+
+search - search a plugin on wordpress.org
+
+	PARAMETERS:
+		(*)term=<*term> - a search term
+		(*)tag=<*tag> - a tag to search, supports mutiples tags by using the plus sign.
+		(*)author=<*author> - a plugin author to be search
+	USAGE: 
+		wrush plugin search term=post archive
+		wrush plugin search tag=spam
+		wrush plugin search author=frank
+
+install - donwloads and install the requested plugin. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade' and 'wp-content/plugins'. 
+
+	PARAMETERS:
+		<*plugin title/name> - a plugin title or name
+	USAGE: 
+		wrush plugin install spam free wordpress
+
+enable - enables the specified plugin 
+
+	PARAMETERS:
+		<*plugin title/name> - a plugin title or name
+	USAGE: 
+		wrush plugin enable WikiWP
+
+disable - disables the specified plugin 
+
+	PARAMETERS:
+		<*plugin title/name> - a plugin title or name
+	USAGE: 
+		wrush plugin disable spam free wordpress
+
+delete- donwloads and install the requested plugin. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/plugins' and plugin folder. 
+
+	PARAMETERS:
+		<*plugin title/name> - a plugin title or name
+	USAGE: 
+		wrush plugin delete spam free wordpress
+
+update - updates the specified plugin to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/plugins' and plugin folder. 
+
+	PARAMETERS:
+		<*plugin title/name> - a plugin title or name
+	USAGE: 
+		wrush plugin update spam free wordpress
+
+updateall - updates all installed plugin to the latest version. The user running this command must not be root and must the owner of the folders 'wp-content', 'wp-content/upgrade', 'wp-content/plugins' and all plugin folders. 
+
+	USAGE: 
+		wrush plugin updateall
+
+
+Available actions (utils section): 
+----------------------------------
 	
 	perm - sets the folder/file permissions to the one specified in the variables web_user, web_group, file_permissions and folder_permissions on top of script. Requires sudo or user to be root
 	
