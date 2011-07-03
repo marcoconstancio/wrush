@@ -1,0 +1,2286 @@
+#!/usr/bin/php
+<?php
+
+# Main sources and contributors: 
+# - http://wordpress.stackexchange.com/questions/1714/initialization-script-for-standard-aspects-of-a-wordpress-website
+# - http://codex.wordpress.org/
+
+$options = array();
+$options['wordpress_url'] = "http://wordpress.org/";
+
+#if specified, the script will try to find a wordpress 
+#installation on this folder/sub-folder
+$options['root_folder'] = ""; #example: "wordpress_folder/"
+
+#if specified, the script will try to change the user owner 
+#and group owner in certain write operations
+$options['web_user'] = ""; # usually www-data
+$options['web_group'] = ""; # usually www-data
+
+$options['file_permissions'] = 644;
+$options['folder_permissions'] = 755;
+
+$options['param_separator'] = ",";
+$options['field_value_separator'] = "=";
+$options['multiple_values_separator'] = "+";
+
+
+/************************************************** USER FIELDS AND OPTIONS ***********************************************************/
+
+/* Available fields:
+'ID', 'user_login', 'user_pass', 'user_nicename', 'user_email', 
+'user_url', 'user_registered', 'user_activation_key', 'user_status', 'display_name'
+*/
+
+$options['user_list_fields'] = array('ID','user_login','user_email','status','display_name','user_nicename');
+
+/* Available fields:
+'ID', 'user_login', 'user_pass', 'user_nicename', 'user_email', 'user_url', 'user_registered', 
+'user_activation_key', 'user_status', 'display_name', 'first_name', 'last_name', 'nickname', 
+'description', 'rich_editing', 'comment_shortcuts', 'admin_color', 'use_ssl', 
+'show_admin_bar_front', 'show_admin_bar_admin', 'aim', 'yim', 'jabber', 
+'wp_capabilities', 'wp_user_level', 'wp_dashboard_quick_press_last_post_id', 
+'metaboxhidden_page', 'plugins_last_view', 'closedpostboxes_page', 'user_level', 
+'user_firstname', 'user_lastname', 'user_description'
+*/
+
+$options['user_info_fields'] = array('ID','user_login','display_name','nickname','user_nicename',
+									 'user_firstname','user_lastname','user_email','user_url',
+									 'description','user_registered','wp_capabilities',
+									 'wp_user_level','jabber','yim','aim','use_ssl');
+
+$options['user_update_fields'] = array('display_name','nickname','user_pass','first_name',
+									  'last_name','user_email','user_url','description',
+									  'role','jabber','yim','aim','wp_user_level','use_ssl');
+									  
+									  
+/************************************************** CATEGORY FIELDS AND OPTIONS *********************************************************/
+
+/* Available fields:
+'term_id', 'name', 'slug', 'term_group', 'term_taxonomy_id', 'taxonomy', 'description', 
+'parent', 'count', 'cat_ID', 'category_count', 'category_description', 
+'cat_name', 'category_nicename', 'category_parent'
+*/
+
+$options['category_list_fields'] = array('cat_ID','cat_name','category_nicename');
+
+$options['category_info_fields'] = array('cat_ID','cat_name','category_nicename','term_id',
+										 'term_group','parent','count','category_description');
+
+$options['category_update_fields'] = array('cat_name','category_nicename','parent','category_description');
+
+
+/************************************************** POST FIELDS AND OPTIONS *************************************************************/
+
+$options['post_config'] = array('type'=>'post','categories'=>true,'tags'=>true,'terms'=>true,'comments'=>true);
+
+$options['post_show_password'] = false;
+
+$options['post_status_fields'] = array('draft','publish','pending','future','private');
+$options['post_comment_status_fields'] = array('closed','open');
+$options['post_ping_status_fields'] = array('closed','open');
+
+/* Available fields:
+'ID','post_author','post_date','post_date_gmt','post_content','post_title','post_excerpt',
+'post_status','comment_status','ping_status','post_password','post_name','to_ping','pinged',
+'post_modified','post_modified_gmt','post_content_filtered','post_parent','guid','menu_order',
+'post_type','post_mime_type','comment_count','filter'
+*/
+
+$options['post_list_fields'] = array('ID','post_title','post_author','post_status','post_password');
+
+/*  Available fields:
+'ID','post_author','post_date','post_date_gmt','post_content','post_title','post_excerpt',
+'post_status','comment_status','ping_status','post_password','post_name','to_ping','pinged',
+'post_modified','post_modified_gmt','post_content_filtered','post_parent','guid','menu_order',
+'post_type','post_mime_type','comment_count','ancestors','filter'
+*/
+
+$options['post_info_fields'] = array('ID','post_title','post_name','post_author','post_status',
+									 'post_content','post_date','post_modified','comment_status',
+									 'post_type','guid','post_password');
+									 
+$options['post_info_show_categories'] = true; 
+$options['post_info_show_tags'] = true; 
+$options['post_info_show_terms'] = false; 									 
+									 
+$options['post_update_fields'] = array('ID','post_title','post_name','post_author','post_status',
+									   'post_content','post_excerpt','post_date','post_modified',
+									   'post_date_gmt','comment_status','post_parent','guid',
+									   'post_password','menu_order','comment_status','ping_status', 
+									   'pinged', 'tags_input', 'post_category' //,'post_type'
+										# not sure if it is wise to change
+										# the post type, use with care
+										#'post_type' => ['post'|'page'|'link'|'nav_menu_item'|custom post type] 									   
+									   );
+
+
+/************************************************** PAGE FIELDS AND OPTIONS ***********************************************************/
+
+/* Available fields:
+'ID','post_author','post_date','post_date_gmt','post_content','post_title','post_excerpt',
+'post_status','comment_status','ping_status','post_password','post_name','to_ping','pinged',
+'post_modified','post_modified_gmt','post_content_filtered','post_parent','guid','menu_order',
+'post_type','post_mime_type','comment_count','filter'
+*/
+
+$options['page_list_fields'] = array('ID','post_title','post_author','post_status','post_password');
+
+/* Available fields:
+'ID','post_author','post_date','post_date_gmt','post_content','post_title','post_excerpt',
+'post_status','comment_status','ping_status','post_password','post_name','to_ping','pinged',
+'post_modified','post_modified_gmt','post_content_filtered','post_parent','guid','menu_order',
+'post_type','post_mime_type','comment_count','ancestors','filter'
+*/
+
+$options['page_info_fields'] = array('ID','post_title','post_name','post_author','post_status',
+									 'post_content','post_date','post_modified','comment_status',
+									 'post_type','guid','post_password','post_parent');
+
+$options['page_show_password'] = false;
+$options['page_info_show_terms'] = false; 
+
+$options['page_status_fields'] = array('draft','publish','pending','future','private');
+$options['page_comment_status_fields'] = array('closed','open');
+$options['page_ping_status_fields'] = array('closed','open');
+									 
+$options['page_update_fields'] = array('ID','post_title','post_name','post_author','post_status',
+									   'post_content','post_excerpt','post_date','post_modified',
+									   'post_date_gmt','comment_status','post_parent','guid',
+									   'post_password','menu_order','comment_status','ping_status', 
+									   'pinged' //,'post_type'
+										# not sure if it is wise to change
+										# the post type, use with care
+										#'post_type' => ['post'|'page'|'link'|'nav_menu_item'|custom post type] 									   
+									   );
+
+/************************************************** THEME FIELDS AND OPTIONS ************************************************************/
+
+/* Available fields:
+'Name','Title','Description','Author','Author Name','Author URI','Version','Template',
+'Stylesheet','Template Files','Stylesheet Files','Template Dir','Stylesheet Dir',
+'Status','Screenshot','Tags','Theme Root','Theme Root URI','Parent Theme'
+*/
+
+$options['theme_list_fields'] = array('Title','Version','Author Name','Status');
+
+$options['theme_list_show_current'] = true;
+
+$options['theme_info_fields'] = array('Title','Version','Author Name','Author URI',
+									  'Status','Theme Root','Description','Tags');
+
+/* Available fields:
+'name','slug','version','author','preview_url','screenshot_url','rating',
+'num_ratings','downloaded','last_updated','homepage','description',
+'download_link','tags'
+*/
+$options['theme_search_fields'] = array('name','slug','author','rating','num_ratings',
+									    'downloaded','last_updated','preview_url','homepage',
+									    'screenshot_url','download_link','tags','description');
+
+$options['theme_info_show_current'] = true;
+
+$options['theme_search_num_result'] = 5;
+
+
+/************************************************** PLUGINS FIELDS AND OPTIONS *********************************************************/
+
+/* Available fields:
+'Name','PluginURI','Version','Description','Author','AuthorURI',
+'TextDomain','DomainPath','Network','Title','AuthorName'
+*/
+
+$options['plugin_list_fields'] = array('Name','Version','Author');
+
+$options['plugin_list_show_activated'] = true;
+
+$options['plugin_info_fields'] = array('Name','Version','Author','AuthorURI','Description');
+
+$options['plugin_info_show_activated'] = true;
+
+$options['plugin_search_num_result'] = 5;
+
+/* Available fields:
+'name','slug','version','author','author_profile','contributors','requires','tested',
+'compatibility','rating','num_ratings','homepage','description','short_description'
+*/
+
+$options['plugin_search_fields'] = array('name','slug','version','author','homepage','contributors',
+										 'compatibility','rating','num_ratings','short_description');
+
+/************************************************** FILTERS *********************************************************************/
+
+$options['category_list_filters'] = array('type' => 'post', 'child_of' => 0, 
+										 'orderby' => 'name', 'order' => 'ASC', 
+										 'hide_empty' => 0, 'hierarchical' => 0, 
+										 'exclude' => null, 'include' => null ,
+										 'number' => null, 'taxonomy' => 'category',
+										 'pad_counts' => false //, 'parent' => null 
+										  # setting the parent argument above might cause
+										  # empty subcategories not to be listed, use with care
+										 );
+
+$options['post_list_filters'] = array('numberposts' => 50, 'offset' => 0, 
+									  'category' => null, 'orderby' => 'post_date',
+									  'order' => 'DESC', 'include' => null,
+								 	  'exclude' => null, 'meta_key' => null, 
+									  'meta_value' => null, 'post_type' => 'post',
+							 		  'post_mime_type' => null, 'post_parent' => null,  
+									  'post_status' => 'any' );
+
+$options['page_list_filters'] = array('numberposts' => 50, 'offset' => 0, 
+									  'post_status' => 'any', 'orderby' => 'post_date',
+									  'order' => 'DESC', 'include' => null,
+								 	  'exclude' => null, 'meta_key' => null, 
+									  'meta_value' => null, 'post_type' => 'page',
+							 		  'post_mime_type' => null, 'post_parent' => null );
+										 
+if(isset($argv[1])){
+	switch($argv[1]){
+		case 'core': 
+			if(isset($argv[2])){
+				switch($argv[2]){	
+					case 'dl': 
+						core_dl(get_params($argv),$options);	
+						break;	
+					case 'db': 
+						check_installation($options); 
+						check_permissions($options);
+						db_set('ALL',get_params($argv),$options); 
+					break;		
+					case 'dbname': 
+						check_installation($options);
+						check_permissions($options); 
+						db_set('DB_NAME',get_params($argv),$options); 
+						break;	
+					case 'dbhost': 
+						check_installation($options); 
+						check_permissions($options);
+						db_set('DB_HOST',get_params($argv),$options); 
+						break;
+					case 'dbuser': 
+						check_installation($options); 
+						check_permissions($options);
+						db_set('DB_USER',get_params($argv),$options); 
+						break;
+					case 'dbpass': 
+						check_installation($options); 
+						check_permissions($options);
+						db_set('DB_PASSWORD',get_params($argv),$options); 
+						break;		
+					default: 
+						echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\ndl, db, dbname, dbhost, dbuser, dbpass\n";
+					break;							
+				}
+			}else{
+				echo "Please use one of the following actions:\ndl, db, dbname, dbhost, dbuser, dbpass\n";
+			}
+		break;
+		case 'user':
+			if(isset($argv[2])){
+				switch($argv[2]){	
+					case 'create':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						user_create(get_params($argv),$options); 
+					break;													
+					case 'list':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php";  
+						user_list(get_params($argv),$options); 
+					break;								
+					case 'delete':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/user.php"; 
+						user_delete(get_params($argv),$options); 
+					break;
+					case 'info':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						user_info(get_params($argv),$options); 
+					break;						
+					case 'update':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/user.php"; 
+						user_update(get_params($argv),$options); 
+					break;	
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\ncreate, list, delete, info, update\n";
+					break;																
+				}
+			}else{
+				echo "Please use one of the following actions:\ncreate, list, delete, info, update\n";
+			}		
+		break;			
+		case 'plugin':
+			if(isset($argv[2])){
+				switch($argv[2]){													
+					case 'list':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php"; 
+						plugin_list(get_params($argv),$options);
+					break;			
+					case 'info':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php"; 
+						plugin_info(get_params($argv),$options); 
+					break;		
+					case 'enable':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";  
+						section_change_status(get_params($argv),$options,"plugin",true);
+					break;														
+					case 'disable':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";  
+						section_change_status(get_params($argv),$options,"plugin",false);
+					break;		
+					case 'install':
+						// REQUIRES write permissions 
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";
+						@require_once $options['root_folder']."wp-admin/includes/class-wp-upgrader.php";
+						@require_once $options['root_folder']."wp-admin/includes/plugin-install.php";
+						plugin_install(get_params($argv),$options);
+					break;
+					case 'delete':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";							
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";  				
+						section_delete(get_params($argv),$options,"plugin"); 
+					break;						
+					case 'search':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";		
+						@require_once $options['root_folder']."wp-admin/includes/plugin-install.php";					
+						section_search(get_params($argv),$options,'plugin');
+					break;		
+					case 'update':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";
+						@require_once $options['root_folder']."wp-admin/includes/class-wp-upgrader.php";
+						@require_once $options['root_folder']."wp-admin/includes/plugin-install.php";					
+						plugin_update(get_params($argv),$options);
+					break;		
+					case 'updateall':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/plugin.php";
+						@require_once $options['root_folder']."wp-admin/includes/class-wp-upgrader.php";
+						@require_once $options['root_folder']."wp-admin/includes/plugin-install.php";					
+						plugin_update_all(get_params($argv),$options);
+					break;		
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\nlist, info, enable, disable, install, delete, search, update, updateall\n"; 
+					break;
+					break;																		
+				}
+			}else{
+				echo "Please use one of the following actions:\nlist, info, enable, disable, install, delete, search, update, updateall\n";
+			}		
+		break;
+		case 'theme': 
+			if(isset($argv[2])){
+				switch($argv[2]){													
+					case 'list':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/theme.php"; 
+						theme_list(get_params($argv),$options); 
+					break;			
+					case 'info':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/theme.php"; 
+						theme_info(get_params($argv),$options); 
+					break;		
+					case 'enable':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/theme.php"; 
+						section_change_status(get_params($argv),$options,"theme",true);
+					break;														
+					case 'install':
+						check_installation($options);
+						// REQUIRES write permissions 
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/theme-install.php";		
+						@require_once $options['root_folder']."wp-admin/includes/theme.php";	
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/class-wp-upgrader.php";
+						theme_install(get_params($argv),$options);
+					break;
+					case 'delete':
+						check_installation($options);
+						// REQUIRES write permissions 
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/theme.php";					
+						section_delete(get_params($argv),$options,"theme"); 
+					break;						
+					case 'search':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/theme-install.php";		
+						require_once $options['root_folder']."wp-admin/includes/theme.php";		
+						section_search(get_params($argv),$options,'theme');
+					break;		
+					case 'update':
+						check_installation($options);
+						// REQUIRES write permissions 
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/theme.php";
+						@require_once $options['root_folder']."wp-admin/includes/class-wp-upgrader.php";
+						theme_update(get_params($argv),$options);
+					break;													
+					case 'updateall':
+						check_installation($options);
+						// REQUIRES write permissions 
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/file.php";	
+						@require_once $options['root_folder']."wp-admin/includes/theme.php";
+						@require_once $options['root_folder']."wp-admin/includes/class-wp-upgrader.php";
+						theme_update_all(get_params($argv),$options);
+					break;	
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\nlist, info, enable, install, delete, search, update, updateall\n"; 
+					break;					
+				}
+			}else{
+				echo "Please use one of the following actions:\nlist, info, enable, disable, install, delete, search, update, updateall\n";
+			}			
+		break;
+		case 'category': 
+			if(isset($argv[2])){
+				switch($argv[2]){	
+					case 'create':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/taxonomy.php";
+						category_create(get_params($argv),$options); 
+					break;								
+					case 'list':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php";  
+						@require_once $options['root_folder']."wp-admin/includes/taxonomy.php";
+						category_list(get_params($argv),$options); 
+					break;								
+					case 'delete':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/category.php";
+						category_delete(get_params($argv),$options); 
+					break;
+					case 'info':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/category.php";
+						category_info(get_params($argv),$options); 
+					break;						
+					case 'update':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-admin/includes/taxonomy.php";
+						category_update(get_params($argv),$options); 
+					break;
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\ncreate, list, delete, info, update\n"; 
+					break;																		
+				}
+			}else{
+				echo "Please use one of the following actions:\ncreate, list, delete, info, update\n";
+			}	
+		break;			
+		case 'post': 
+			if(isset($argv[2])){
+				switch($argv[2]){	
+					case 'create':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						post_create(get_params($argv),$options);
+					break;								
+					case 'list':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php";  
+						@require_once $options['root_folder']."wp-includes/post.php";
+						post_list(get_params($argv),$options); 
+					break;								
+					case 'delete':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						post_delete(get_params($argv),$options); 
+					break;
+					case 'info':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						post_info(get_params($argv),$options); 
+					break;						
+					case 'update':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						post_update(get_params($argv),$options); 
+					break;	
+					case 'emptytrash':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						$options['post_config']['type'] = 'post';
+						emptytrash(get_params($argv),$options);
+					break;	
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\ncreate, list, delete, info, update, emptytrash\n"; 
+					break;																				
+				}
+			}else{
+				echo "Please use one of the following actions:\ncreate, list, delete, info, update, emptytrash\n";
+			}			
+		break;				
+		case 'page': 
+			if(isset($argv[2])){
+				$options['post_config'] = array('type'=>'page',
+												'comments'=>true,
+												'categories'=>false,
+												'tags'=>false,
+												'terms'=>false);								
+				switch($argv[2]){	
+					case 'create':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						page_create(get_params($argv),$options);
+					break;								
+					case 'list':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php";  
+						@require_once $options['root_folder']."wp-includes/post.php";
+						page_list(get_params($argv),$options); 
+					break;								
+					case 'delete':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						page_delete(get_params($argv),$options); 
+					break;
+					case 'info':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						page_info(get_params($argv),$options); 
+					break;						
+					case 'update':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						page_update(get_params($argv),$options); 
+					break;	
+					case 'emptytrash':
+						check_installation($options);
+						@require_once $options['root_folder']."wp-load.php"; 
+						@require_once $options['root_folder']."wp-includes/post.php";
+						$options['post_config']['type'] = 'page';
+						emptytrash(get_params($argv),$options);
+					break;	
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions:\ncreate, list, delete, info, update, emptytrash\n"; 
+					break;																				
+				}
+			}else{
+				echo "Please use one of the following actions:\ncreate, list, delete, info, update, emptytrash\n";
+			}					
+		break;	
+		case 'utils': 
+			if(isset($argv[2])){
+				switch($argv[2]){			
+					case 'perm': 
+						check_installation($options); 
+						set_folder_recursive_permissions(get_params($argv),$options); 
+						break;
+					default: echo "'".$argv[2]."' in not a valid action. Please use one of the following actions: \nperm\n"; 
+					break;						
+				}
+			}else{
+				echo "Please use one of the following actions:\nperm\n";
+			}
+		break;			
+		default: 
+			echo "'".$argv[1]."' in not a valid section. Please use one of the following sections:\ncore, user, theme, plugin, page, post, category, utils\n";
+		break;
+	}
+}else{
+	echo "Please use one of the following sections:\ncore, user, theme, plugin, page, post, category, utils\n";
+}
+
+#
+# CORE
+#
+
+
+function core_dl($parm, $options){
+	
+	if(empty($parm)){
+		$filename = "latest.zip";
+	}else{
+		$filename = "wordpress-".$parm.".zip";
+	}
+	
+	$fullPath  = $options['wordpress_url'].$filename;
+
+	$handle = @fopen($fullPath, "rb");
+	if($handle != false){
+		echo "Downloading: ".$fullPath; 
+		$contents = stream_get_contents($handle);
+		fclose($handle);
+
+		$handle = @fopen($options['root_folder'].$filename ,"w");
+		if($handle != false){
+			fwrite($handle,$contents);
+			fclose($handle);
+			echo " DONE. ";
+			
+			echo " Extracting: ";
+			unzip_files($filename,$options);
+			echo "DONE.\n";
+			
+			#Delete zip file
+			unlink($options['root_folder'].$filename);		
+		}else{
+			echo "\nERROR:You don't have permissions to write the file ".$options['root_folder'].$filename." on this directory.\n";
+		}
+	}else{
+		echo "\nERROR:The file ".$fullPath." does not exist.\n";
+		return false;
+	}
+	return true;
+}
+
+function db_set($action,$param,$options){
+	$filename = $options['root_folder']."wp-config.php";
+	$handle = fopen($filename,"rb");
+	$content = fread($handle,filesize($filename));
+	fclose($handle);
+
+	if($action!="ALL"){
+		$content = preg_replace("/.*?".$action.".*?\);/", "define('".$action."', '".trim($param)."');", $content);
+	}else{
+		$param = explode($options['param_separator'],$param);
+
+		if(count($param) == 4){
+			$content = preg_replace("/.*?DB_NAME.*?\);/", "define('DB_NAME', '".trim($param[0])."');", $content);
+			$content = preg_replace("/.*?DB_HOST.*?\);/", "define('DB_HOST', '".trim($param[1])."');", $content);
+			$content = preg_replace("/.*?DB_USER.*?\);/", "define('DB_USER', '".trim($param[2])."');", $content);
+			$content = preg_replace("/.*?DB_PASSWORD.*?\);/", "define('DB_PASSWORD', '".trim($param[3])."');", $content);
+		}else{
+			echo "Please insert all parameters: <database name>".$options['param_separator']." <database host>".$options['param_separator']." <database user>".$options['param_separator']." <database password>\n";
+			exit;
+		}
+	}
+	
+	$handle = fopen($filename ,"w");
+	fwrite($handle,$content);
+	fclose($handle);
+	set_permissions($filename,$options['file_permissions'] ,$options);	
+	echo "Finished changing the settings.\n";
+}
+
+function get_params($argv){
+	array_shift($argv);
+	array_shift($argv);
+	array_shift($argv);
+	return implode(" ",$argv);
+}
+
+#
+# USERS
+#
+
+function user_create($param,$options){
+	$param = explode($options['param_separator'],$param);
+
+	if(count($param) > 2){
+		$user = get_user_by('login',$param[0]);
+		
+		if (!is_object($user)) {
+		  $user_data = array('user_login'=>trim($param[0]),
+							 'user_pass'=>trim($param[1]),
+							 'user_email'=>trim($param[2]));		
+							 
+		  if(isset($param[3])){ $user_data['role'] = trim($param[3]); }	
+		  if(isset($param[4])){ $user_data['first_name'] = trim($param[4]); }
+		  if(isset($param[5])){ $user_data['last_name'] = trim($param[5]); }
+		  
+		  if(wp_insert_user($user_data)){
+			  echo "User created.\n";
+		  }else{
+			  echo "ERROR: User not created.\n";
+		  }
+		  
+		}else{
+			echo "A user already exists with the username '".trim($param[0])."'.\n";
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*username>".$options['param_separator']." <*password>".$options['param_separator']." <*email>".$options['param_separator']." <role>".$options['param_separator']." <first name>".$options['param_separator']." <last name>\n";
+	}	
+}
+
+function user_list($param,$options){	
+	$users_data = get_users();
+	foreach($users_data as $user_data){
+		$line = "";
+		foreach($options['user_list_fields'] as $field){
+			if(isset($user_data->$field)){
+				$line .= strtoupper($field).": ".$user_data->$field." - ";
+			}
+		}
+		echo substr($line,0,strlen($line)-2)."\n";
+	}
+}
+
+function user_delete($param,$options){
+	$param = trim($param);
+
+	$user_by_slug = get_user_by('slug',$param);
+	$user_by_id = get_user_by('id',$param);
+	$user_by_login = get_user_by('login',$param);
+	$user_by_email = get_user_by('email',$param);
+
+	if(strlen($param)){
+		if($user_by_slug || $user_by_id || $user_by_login || $user_by_email){
+			
+			if($user_by_slug){ $user_id = $user_by_slug->ID; }	
+			if($user_by_id){ $user_id = $user_by_id->ID; }	
+			if($user_by_login){ $user_id = $user_by_login->ID; }					
+			if($user_by_email){ $user_id = $user_by_email->ID; }	
+			
+			if(wp_delete_user($user_id)){
+			  echo "User deleted.\n";
+		  }else{
+			  echo "ERROR: User not deleted.\n";
+		  }						
+			
+		}else{
+			echo "There is no user with the username/slug (nice name)/id/email '".$param."'. Please insert a valid username/slug (nice name)/id/email\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*username/slug (nice name)/id/email>\n";			
+	}		
+}
+
+function user_update($param,$options){
+	$param = explode($options['param_separator'],$param);
+
+	$user_by_slug = get_user_by('slug',$param[0]);
+	$user_by_id = get_user_by('id',$param[0]);
+	$user_by_login = get_user_by('login',$param[0]);
+	$user_by_email = get_user_by('email',$param[0]);
+
+	if(strlen($param[0])){
+		if($user_by_slug || $user_by_id || $user_by_login || $user_by_email){
+			array_shift($param);
+			$user_data = array();
+
+			if($user_by_slug){ $user_data['ID'] = $user_by_slug->ID; }
+			if($user_by_id){ $user_data['ID'] = $user_by_id->ID; }
+			if($user_by_login){ $user_data['ID'] = $user_by_login->ID; }
+			if($user_by_email){ $user_data['ID'] = $user_by_email->ID; }
+			
+			foreach($param as $name_value){
+				$name_value = explode($options['field_value_separator'],$name_value);
+				if(count($name_value)==2){
+					if(in_array(trim($name_value[0]),$options['user_update_fields'])){
+						$user_data[trim($name_value[0])]=trim($name_value[1]);
+					}else{
+						echo "\nThe fieldname name ".trim($name_value[0])." is not permited.\n";
+					}
+				}
+			}
+			
+			if(@wp_update_user($user_data)){
+			  echo "User with updated.\n";
+			}else{
+			  echo "ERROR: User not updated.\n";
+			}		
+					
+		}else{
+			echo "There is no user with the username/slug (nice name)/id/email '".$param[0]."'. Please insert a valid username/slug (nice name)/id/email.\n";		
+		}
+	}else{
+		echo "\nPlease insert the necessary parameters : <*username/slug (nice name)/id/email>".$options['param_separator']." <*name 1>".$options['field_value_separator']."<*value 1>".$options['param_separator']." <name 2>".$options['field_value_separator']."<value 2>".$options['param_separator']." ..<name n>".$options['field_value_separator']."<value n>\n\n";	
+		echo "AVAILABLE PARAMETERS NAMES: \n".implode(", ",$options['user_update_fields'])."\n\n";
+	}
+}
+
+function user_info($param,$options){
+	$param = trim($param);
+
+	$user_by_slug = get_user_by('slug',$param);
+	$user_by_id = get_user_by('id',$param);
+	$user_by_login = get_user_by('login',$param);
+	$user_by_email = get_user_by('email',$param);
+	
+	if(strlen($param)){	
+		if($user_by_slug || $user_by_id || $user_by_login || $user_by_email){
+			
+			if($user_by_slug){ $user_data = $user_by_slug; }	
+			if($user_by_id){ $user_data = $user_by_id; }	
+			if($user_by_login){ $user_data = $user_by_login; }					
+			if($user_by_email){ $user_data = $user_by_email; }			
+
+			foreach($options['user_info_fields'] as $field){
+				if(is_string($user_data->$field)){
+					echo strtoupper($field).": ".$user_data->$field."\n";
+				}else{
+					echo strtoupper($field).": ".implode(",",array_keys($user_data->$field))."\n";
+				}
+			}
+		}else{
+			echo "There is no user with the username/slug (nice name)/id/email '".$param."'. Please insert a valid username/slug (nice name)/id/email\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*username/slug (nice name)/id/email>\n";			
+	}		
+}
+
+#
+# Category
+#
+
+function category_list($param,$options){	
+	$categories_data = get_categories($options['category_list_filters']); 
+	foreach($categories_data as $category_data){
+		$line = "";
+		foreach($options['category_list_fields'] as $field){
+			if(isset($category_data->$field)){
+				$line .= strtoupper($field).": ".$category_data->$field." - ";
+			}
+		}
+		echo substr($line,0,strlen($line)-2)."\n";
+	}		
+}
+
+function category_info($param,$options){	
+	
+	$category_by_slug = get_category_by_slug(trim($param));	
+	$category_by_id = get_category(trim($param));	
+	$category_by_name = get_category_by_name(trim($param),$options);
+	
+	if(strlen($param)){
+		if($category_by_slug || $category_by_id || $category_by_name){
+			
+			if($category_by_name){ $category_data = $category_by_name; }
+			if($category_by_slug){ $category_data = $category_by_slug; }
+			if($category_by_id){ $category_data = $category_by_id; }
+			
+			
+			foreach($options['category_info_fields'] as $field){
+				if(is_string($category_data->$field)){
+					echo strtoupper($field).": ".$category_data->$field."\n";
+				}else if(is_array($category_data->$field)){
+					echo strtoupper($field).": ".implode(",",array_keys($category_data->$field))."\n";
+				}
+			}
+			
+		}else{
+			echo "There is no category with the name/slug (nice name)/id '".$param."'. Please insert a valid name/slug (nice name)/id.\n";		
+		}	
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*category name/slug (nice name)/id>\n";			
+	}		
+}
+
+function category_create($param,$options){
+	$param = explode($options['param_separator'],$param);
+
+	if(!empty($param[0])){
+		if (!category_exists(trim($param[0]))) {
+			$category_data = array('cat_name' => trim($param[0]));
+				
+			if(isset($param[1])){ $category_data['category_description'] = $param[1]; }	
+			if(isset($param[2])){ $category_data['category_nicename'] = $param[2]; }
+			if(isset($param[3])){ 
+				
+				$category_by_slug = get_category_by_slug(trim($param[3]));	
+				$category_by_id = get_category(trim($param[3]));
+				$category_by_name = get_category_by_name(trim($param[3]),$options);
+				
+				if($category_by_slug){
+					$category_data['category_parent'] = $category_by_slug->cat_ID; 
+				}else if($category_by_id){
+					$category_data['category_parent'] = $category_by_id->cat_ID; 
+				}else if($category_by_name){
+					$category_data['category_parent'] = $category_by_name->cat_ID; 
+				}else{
+					echo "ERROR: The is no category with the name/slug (nice name)/id '".trim($param[3])."'.  Please insert the a valid name/slug (nice name)/id for the parent category or remove the parameter.\n";
+					exit;
+				}	
+			}
+
+			if(@wp_insert_category($category_data)){
+			  echo "Category created.\n";
+			}else{
+			  echo "ERROR: Category not created.\n";
+			}	
+		}else{
+			echo "A category already exists with the name '".trim($param[0])."'.\n";
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*category name>".$options['param_separator']." <category description>".$options['param_separator']." <category slug (nice name)>".$options['param_separator']." <category parent name/id> \n";		
+	}
+}
+
+function category_update($param,$options){
+	$param = explode($options['param_separator'],$param);
+
+	$category_by_slug = get_category_by_slug(trim($param[0]));
+    $category_by_id = get_category(trim($param[0]));
+	$category_by_name = get_category_by_name(trim($param[0]),$options);
+
+	if(strlen($param[0])){
+		if($category_by_slug || $category_by_id || $category_by_name){
+			
+			array_shift($param);
+			$category_data = array();
+
+			if($category_by_slug){ $category_data['cat_ID'] = $category_by_slug->cat_ID; }
+			if($category_by_id){ $category_data['cat_ID'] = $category_by_id->cat_ID; }
+			if($category_by_name){ $category_data['cat_ID'] = $category_by_name->cat_ID; }
+
+			foreach($param as $name_value){
+				$name_value = explode($options['field_value_separator'],$name_value);
+				if(count($name_value)==2){
+					if(in_array(trim($name_value[0]),$options['category_update_fields'])){
+						if(trim($name_value[0]) == "parent"){
+							
+							$category_by_slug = get_category_by_slug(trim($name_value[1]));	
+							$category_by_id = get_category(trim($name_value[1]));
+							$category_by_name = get_term_by('name', trim($param), 'category');
+							
+							if($category_by_slug){
+								$category_data['category_parent'] = $category_by_slug->cat_ID; 
+							}else if($category_by_id){
+								$category_data['category_parent'] = $category_by_id->cat_ID; 
+							}else if($category_by_name){
+								$category_by_name = get_category($category_by_name->term_id);
+								$category_data['category_parent'] = $category_by_name->cat_ID; 								
+							}else{
+								echo "ERROR: There is no category with the slug/id '".trim($name_value[1])."'.  Please insert the a valid slug/id for the parent catetory or remove the parameter.\n";
+								exit;
+							}							
+						}else{
+							$category_data[trim($name_value[0])]=trim($name_value[1]);
+						}
+					}else{
+						echo "\nThe fieldname name ".trim($name_value[0])." is not permited.\n";
+					}
+				}
+			}
+			
+			if(@wp_update_category($category_data)){
+			  echo "category with updated.\n";
+			}else{
+			  echo "ERROR: category not updated.\n";
+			}		
+					
+		}else{
+			echo "There is no category with the name/slug (nice name)/id '".$param[0]."'. Please insert a valid name/slug (nice name)/id.\n";		
+		}
+	}else{
+		echo "\nPlease insert the necessary parameters : <*category name/slug (nice name)/id>".$options['param_separator']." <*name 1>".$options['field_value_separator']."<*value 1>".$options['param_separator']." <name 2>".$options['field_value_separator']."<value 2>".$options['param_separator']."...<name n>".$options['field_value_separator']."<value n>\n\n";	
+		echo "AVAILABLE PARAMETERS NAMES: \n".implode(", ",$options['category_update_fields'])."\n\n";
+	}
+}
+
+function get_category_by_name($cat_name,$options){	
+	$categories_data = get_categories($options['category_list_filters']); 
+	
+	$result_data = array();
+	foreach($categories_data as $category_data){
+		if($category_data->cat_name == $cat_name){
+			$result_data[] = $category_data;
+		}
+	}
+
+	if(count($result_data)>1){
+		echo "There is more then 1 category with the name '".$cat_name."'. Please use the category slug (nice name) instead.\n";
+		exit;
+	}else if(isset($result_data[0])){
+		return $result_data[0];
+	}else{
+		return false;
+	}
+}
+
+function category_delete($param,$options){
+	$param = trim($param);
+
+	$category_by_slug = get_category_by_slug($param);
+    $category_by_id = get_category($param);
+	$category_by_name = get_category_by_name(trim($param),$options);    
+
+	if(strlen($param)){
+		if($category_by_slug || $category_by_id || $category_by_name){
+			
+			if($category_by_slug){ $category_id = $category_by_slug->cat_ID; }
+			if($category_by_id){ $category_id = $category_by_id->cat_ID; }
+			if($category_by_name){ $category_id = $category_by_name->cat_ID; }
+						
+			if(wp_delete_category($category_id)){
+				echo "Category with slug/id '".$param."' deleted.\n";
+			}else{
+				echo "ERROR: category with slug/id '".$param."' was not deleted.\n";
+			}
+		}else{
+			echo "There is no category with slugid '".$param."'. Please insert a valid name or id.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*category slug/id>\n";			
+	}
+}
+
+#
+# POSTS
+#
+
+function post_list($param,$options){	
+	$posts_data = get_posts($options['post_list_filters']); 
+	
+	foreach($posts_data as $post_data){
+		$line = "";
+		foreach($options['post_list_fields'] as $field){
+			if(isset($post_data->$field)){
+				if($field == 'post_password' && $options['post_show_password'] == false){
+					if(empty($post_data->$field)){
+						$line .= strtoupper($field).": 0 - ";
+					}else{
+						$line .= strtoupper($field).": 1 - ";
+					}
+				}else if($field == 'post_author'){
+					$line .= strtoupper($field).": ".get_user_by('id',$post_data->$field)->display_name." (USER_ID: ".$post_data->$field.") - ";
+				}else{
+					$line .= strtoupper($field).": ".$post_data->$field." - ";
+				}
+			}
+		}
+		echo substr($line,0,strlen($line)-2)."\n";
+	}
+}
+
+
+//FROM: http://www.web-templates.nu/2008/09/02/get-id-by-page-name/
+function get_post_by_title($post_title){
+	global $wpdb;
+	$post_id = $wpdb->get_var("SELECT * FROM $wpdb->posts WHERE post_title = '".$post_title."' AND post_type != 'revision'");
+	return get_post($post_id);
+}
+
+function get_post_by_slug($post_name){
+	global $wpdb;
+	$post_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = '".$post_name."' AND post_type != 'revision'");
+	return get_post($post_id);
+}
+
+function post_info($param,$options){	
+	$post_by_slug = get_post_by_slug(trim($param));
+	$post_by_id = get_post(trim($param));	
+	$post_by_title = get_post_by_title(trim($param),$options);
+	
+	if(strlen($param)){
+		if($post_by_slug || $post_by_id || $post_by_title){
+			
+			if($post_by_title){ $post_data = $post_by_title; }
+			if($post_by_slug){ $post_data = $post_by_slug; }
+			if($post_by_id){ $post_data = $post_by_id; }
+			
+			foreach($options['post_info_fields'] as $field){
+				 if(is_array($post_data->$field)){
+					echo strtoupper($field).": ".implode(",",array_keys($post_data->$field))."\n";
+				}else{	
+					switch($field){	
+						case 'post_password':
+							if($options['post_show_password']){
+								echo strtoupper($field).": ".$post_data->$field."\n";
+							}else{
+								if(empty($post_data->$field)){
+									echo strtoupper($field).": 0 \n";
+								}else{
+									echo strtoupper($field).": 1 \n";
+								}		
+							}
+						break;
+						case 'post_author': 
+							echo strtoupper($field).": ".get_user_by('id',$post_data->$field)->display_name." (USER_ID: ".$post_data->$field.")\n";
+						break;
+						case 'post_parent': 
+							$parent_post = get_post(trim($post_data->$field));	
+							if($parent_post){
+								echo strtoupper($field).": ".$parent_post->post_title." (ID: ".$parent_post->ID.")\n";
+							}else{
+								echo strtoupper($field).": \n";
+							}
+						break;
+						default:
+							echo strtoupper($field).": ".$post_data->$field."\n";
+						break;
+					}					
+				}
+			}
+			
+			if($options['post_config']['categories']){
+				if($options['post_info_show_categories']){
+					$post_categories = wp_get_post_categories($post_data->ID);
+					$cats = array();
+						
+					foreach($post_categories as $c){
+						$cat = get_category( $c );
+						$cats[] =  $cat->name." (ID:".$cat->cat_ID.")";
+					}
+					echo "CATEGORIES: ".implode(", ",$cats)."\n";
+				}
+			}
+			
+			if($options['post_config']['tags']){
+				if($options['post_info_show_tags']){
+					$post_tags = wp_get_post_tags($post_data->ID);
+					$tags = array();
+			
+					foreach($post_tags as $tag){
+						$tags[] =  $tag->name." (TERM_ID:".$tag->term_id.")";
+					}
+					echo "TAGS: ".implode(", ",$tags)."\n";
+				}
+			}
+			
+			if($options['post_config']['terms']){
+				if($options['post_info_show_terms']){			
+					$post_terms = wp_get_post_terms($post_data->ID);
+					$terms = array();
+			
+					foreach($post_terms as $term){
+						$terms[] =  $term->name." (TERM_ID:".$term->term_id.")";
+					}
+					echo "TERMS: ".implode(", ",$terms)."\n";
+				}	
+			}
+										
+		}else{
+			echo "There is no ".$options['post_config']['type'] ." with the title/slug (nice name)/id '".$param."'. Please insert a valid tite/slug (nice name)/id.\n";		
+		}	
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*".$options['post_config']['type'] ." title/slug (nice name)/id>\n";			
+	}	
+}
+
+function post_delete($param,$options){
+	$param = trim($param);
+	
+	$post_by_slug = get_post_by_slug(trim($param));
+	$post_by_id = get_post(trim($param));	
+	$post_by_title = get_post_by_title(trim($param),$options);
+
+	if(strlen($param)){
+		if($post_by_slug || $post_by_id || $post_by_title ){
+			if($post_by_slug){ $post_id = $post_by_slug->ID; }	
+			if($post_by_id){ $post_id = $post_by_id->ID; }	
+			if($post_by_title){ $post_id = $post_by_title->ID; }					
+	
+			if(wp_delete_post($post_id)){
+				echo $options['post_config']['type'] ." deleted.\n";
+			}else{
+				echo "ERROR: ".$options['post_config']['type'] ." not deleted.\n";
+			}					
+		}else{
+			echo "There is no ".$options['post_config']['type'] ." with the title/slug (nice name)/id '".$param."'. Please insert a valid title/slug (nice name)/id\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*".$options['post_config']['type'] ." title/slug (nice name)/id>\n";			
+	}		
+}
+
+function post_create($param,$options){
+	$param = explode($options['param_separator'],$param);
+
+	if(!empty($param[0])){	
+		if (!get_post_by_title(trim($param[0]),$options)) {
+			$post_data = array('post_title' => trim($param[0]));
+			
+			if(isset($options['post_config']['type'])){
+				 $post_data['post_type'] = $options['post_config']['type']; 
+			}else{	
+				$post_data['post_type'] = 'post';
+			}
+
+			if(isset($param[1])){ $post_data['post_content'] = trim($param[1]); }	
+			if(isset($param[2])){ 
+				if(in_array(strtolower(trim($param[2])),$options['post_status_fields'])){
+					$post_data['post_status'] = trim($param[2]); 
+				}else{
+					echo "The ".$options['post_config']['type'] ." status '".trim($param[2])."' is not valid. Please insert null or one of the following status: ".implode(", ",$options['post_status_fields']).".\n";
+					exit;
+				}
+			}	
+			if(isset($param[3]) && strtolower(trim($param[3])) != "null"){ 			
+				$user_by_slug = get_user_by('slug',$param[3]);
+				$user_by_id = get_user_by('id',$param[3]);
+				$user_by_login = get_user_by('login',$param[3]);
+				$user_by_email = get_user_by('email',$param[3]);
+				
+				$user_id = false;	
+				if($user_by_slug){ $user_id = $user_by_slug->ID; }	
+				if($user_by_id){ $user_id = $user_by_id->ID; }	
+				if($user_by_login){ $user_id = $user_by_login->ID; }					
+				if($user_by_email){ $user_id = $user_by_email->ID; }	
+				
+				if($user_id){
+					$post_data['post_author'] = $user_id;
+				}else{
+					echo "User with id/name/slug (nice name)/email '".trim($param[3])."' not found. Insert valid id/name/slug (nice name)/email or use the value null or 1 for to use admin user as author.";
+					exit;
+				}			
+			}else{
+				$post_data['post_author'] = 1;
+			}
+			
+			if($options['post_config']['categories']){
+				if(isset($param[4])){
+					$categories_data = explode($options['multiple_values_separator'],$param[4]);
+					$categories_ids = array();
+					
+					foreach($categories_data as $category_data){
+							$category_by_slug = get_category_by_slug(trim($category_data));
+							$category_by_id = get_category(trim($category_data));
+							$category_by_name = get_category_by_name(trim($category_data),$options);
+						
+							if($category_by_slug || $category_by_id || $category_by_name ){
+								if($category_by_slug){ $categories_ids[] = $category_by_slug->cat_ID; }
+								if($category_by_id){$categories_ids[] = $category_by_id->cat_ID; }
+								if($category_by_name){ $categories_ids[] = $category_by_name->cat_ID; }		
+							}else{
+								echo "The category name/slug (nice name)/id '".trim($category_data)."' is invalid. Insert correct category name/slug (nice name)/id or remove the parameter value.\n";
+								exit;
+							}				
+					}	
+					$post_data['post_category'] = $categories_ids;
+				}
+			}
+			
+			
+			if($options['post_config']['tags']){
+				if(isset($param[5])){ $post_data['tags_input'] = explode($options['multiple_values_separator'],$param[5]); }
+			}
+
+			if(@wp_insert_post($post_data)){
+			  echo $options['post_config']['type'] ." created.\n";
+			}else{
+			  echo "ERROR: ".$options['post_config']['type'] ." not created.\n";
+			}	
+		}else{
+			echo "A ".$options['post_config']['type'] ." already exists with the title '".trim($param[0])."'. (If doesn't show up on list, it might be in the trash folder.)\n";
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters:\n<*title>".$options['param_separator']." <content>".$options['param_separator']." <status>".$options['param_separator']." <author id/name/slug (nice name)/email>";
+		if($options['post_config']['categories']){
+			echo $options['param_separator']." <category 1 name/slug (nice name)/id>".$options['multiple_values_separator']."...<category n name/slug (nice name)/id>";
+		}
+		if($options['post_config']['tags']){
+			echo $options['param_separator']." <tag 1 name>".$options['multiple_values_separator']."...<tag n name>";
+		} 
+		echo "\n";		
+	}
+}
+
+function post_update($param,$options){
+	$param = explode($options['param_separator'],$param);
+
+	$post_by_slug = get_post_by_slug(trim($param[0]));
+	$post_by_id = get_post(trim($param[0]));	
+	$post_by_title = get_post_by_title(trim($param[0]),$options);
+	
+	if(strlen($param[0])){
+		if($post_by_slug || $post_by_id || $post_by_title){
+			
+			array_shift($param);
+			$post_data = array();
+
+			if($post_by_slug){ $post_data['ID'] = $post_by_slug->ID; }
+			if($post_by_id){ $post_data['ID'] = $post_by_id->ID; }
+			if($post_by_title){ $post_data['ID'] = $post_by_title->ID; }
+
+			foreach($param as $name_value){
+				$name_value = explode($options['field_value_separator'],$name_value);
+			
+				if(count($name_value)==2){
+					$name_value[0] = trim($name_value[0]);
+					if(in_array($name_value[0],$options['post_update_fields'])){
+						
+						switch($name_value[0]){	
+							case 'post_category': 
+								if($options['post_config']['categories']){
+									$categories_data = explode($options['multiple_values_separator'],$name_value[1]);
+									$categories_ids = array();
+									
+									foreach($categories_data as $category_data){
+											$category_by_slug = get_category_by_slug(trim($category_data));
+											$category_by_id = get_category(trim($category_data));
+											$category_by_name = get_category_by_name(trim($category_data),$options);
+										
+											if($category_by_slug || $category_by_id || $category_by_name ){
+												if($category_by_slug){ $categories_ids[] = $category_by_slug->cat_ID; }
+												if($category_by_id){$categories_ids[] = $category_by_id->cat_ID; }
+												if($category_by_name){ $categories_ids[] = $category_by_name->cat_ID; }		
+											}else{
+												echo "The category name/slug (nice name)/id '".trim($category_data)."' is invalid. Insert correct category name/slug (nice name)/id or remove the parameter value.\n";
+												exit;
+											}				
+									}	
+									$post_data['post_category'] = $categories_ids;
+								}
+							break;	
+							case 'tags_input':
+								if($options['post_config']['tags']){
+									$post_data['tags_input'] = array();
+									$tag_data = explode($options['multiple_values_separator'],$name_value[1]);
+									foreach($tag_data as $tag_name){
+										$post_data['tags_input'][] = trim($tag_name); 
+									}
+								}
+							break;
+							case 'post_status':
+								$name_value[1] = strtolower(trim($name_value[1]));
+								if(in_array($name_value[1],$options['post_status_fields'])){
+									$post_data['post_status'] = $name_value[1];
+								}else{
+									print "The value '".$name_value[1]."' for '".$name_value[0]."' is invalid. Remove the parameter or insert one of the following values:\n";
+									print implode(", ",$options['post_status_fields'])."\n";
+									exit;
+								}
+							break;							
+							case 'comment_status':
+								if($options['post_config']['comments']){
+									$name_value[1] = strtolower(trim($name_value[1]));
+									if(in_array($name_value[1],$options['post_comment_status_fields'])){
+										$post_data['comment_status'] = $name_value[1];
+									}else{
+										print "The value '".$name_value[1]."' for '".$name_value[0]."' is invalid. Remove the parameter or insert one of the following values:\n";
+										print implode(", ",$options['post_comment_status_fields'])."\n";
+										exit;
+									}
+								}
+							break;							
+							case 'ping_status':
+								$name_value[1] = strtolower(trim($name_value[1]));
+								if(in_array($name_value[1],$options['post_ping_status_fields'])){
+									$post_data['ping_status'] = $name_value[1];
+								}else{
+									print "The value '".$name_value[1]."' for '".$name_value[0]."' is invalid. Remove the parameter or insert one of the following values:\n";
+									print implode(", ",$options['post_ping_status_fields'])."\n";
+									exit;
+								}
+							break;									
+							case 'post_parent':
+								$name_value[1] = strtolower(trim($name_value[1]));
+								$post_by_slug = get_post_by_slug($name_value[1]);
+								$post_by_id = get_post($name_value[1]);	
+								$post_by_title = get_post_by_title($name_value[1],$options);
+								
+								if($post_by_slug || $post_by_id || $post_by_title){
+									if($post_by_slug){ $post_parent_id = $post_by_slug->ID; }
+									if($post_by_id){ $post_parent_id = $post_by_id->ID; }
+									if($post_by_title){ $post_parent_id = $post_by_title->ID; }		
+									
+									$post_data['post_parent'] = $post_parent_id;
+								}else{
+									print "There is no ".$options['post_config']['type'] ." with title/slug (nice name)/id '".$name_value[1]."'. Please insert the a valid title/slug (nice name)/id for the parent ".$options['post_config']['type'] ." or remove the parameter.\n";							
+								}
+							break;									
+							case 'post_author':
+								$name_value[1] = strtolower(trim($name_value[1]));
+								$user_by_slug = get_user_by('slug',$name_value[1]);
+								$user_by_id = get_user_by('id',$name_value[1]);
+								$user_by_login = get_user_by('login',$name_value[1]);
+								$user_by_email = get_user_by('email',$name_value[1]);
+								
+								if($user_by_slug || $user_by_id || $user_by_login || $user_by_email  ){
+									if($user_by_slug){ $user_id = $user_by_slug->ID; }	
+									if($user_by_id){ $user_id = $user_by_id->ID; }	
+									if($user_by_login){ $user_id = $user_by_login->ID; }					
+									if($user_by_email){ $user_id = $user_by_email->ID; }		
+									
+									$post_data['post_author'] = $user_id;
+								}else{
+									echo "There is no user with the username/slug (nice name)/id/email '".$name_value[1]."'. Please insert a valid username/slug (nice name)/id/email\n";		
+								}
+							break;												
+							default: 
+								$post_data[trim($name_value[0])]=trim($name_value[1]);
+							break;								
+						}						
+						
+					}else{
+						echo "\nThe fieldname name ".trim($name_value[0])." is not permited.\n";
+					}
+				}
+			}
+			
+			if(@wp_update_post($post_data)){
+			  echo $options['post_config']['type'] ." updated.\n";
+			}else{
+			  echo "ERROR: ".$options['post_config']['type']." not updated.\n";
+			}		
+		}else{
+			echo "There is no ".$options['post_config']['type']." with the title/slug (nice name)/id '".$param[0]."'. Please insert a valid title/slug (nice name)/id.\n";		
+		}
+	}else{
+			echo "\nPlease insert the necessary parameters : <*".$options['post_config']['type'] ." title/slug (nice name)/id>".$options['param_separator']." <*name 1>".$options['field_value_separator']."<*value 1>".$options['param_separator']." <name 2>".$options['field_value_separator']."<value 2>".$options['param_separator']."...<name n>".$options['field_value_separator']."<value n>\n\n";	
+			echo "AVAILABLE PARAMETERS NAMES: \n".implode(", ",$options['post_update_fields'])."\n\n";
+	}
+}
+
+function emptytrash($param,$options){
+	global $wpdb;
+	$num_posts = 0;
+	$post_data = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND post_type = '".$options['post_config']['type']."'");	
+	foreach($post_data as $post_id){
+		if(@wp_delete_post($post_id)){
+			$num_posts+=1;
+		}
+	}
+	echo "Delete ".$num_posts." ".$options['post_config']['type']."(s) from the trash section.\n";
+}
+
+#
+# PAGE
+#
+
+function page_list($param,$options){		
+	$options['post_list_filters'] = $options['page_list_filters'];
+	$options['post_list_fields'] = $options['page_list_fields'];
+	
+	$options['post_show_password'] = $options['page_show_password'];
+	
+	post_list($param,$options);
+}
+
+function page_info ($param,$options){		
+	$options['post_info_show_terms'] = $options['page_info_show_terms'];
+	$options['post_info_fields'] = $options['page_info_fields'];
+
+	$options['post_show_password'] = $options['page_show_password'];
+	
+	post_info($param,$options);
+}
+
+function page_delete ($param,$options){	
+	post_delete($param,$options);
+}
+
+function page_create($param,$options){
+	post_create($param,$options);
+} 
+
+function page_update($param,$options){
+	$options['post_update_fields'] = $options['page_update_fields'];
+	$options['post_status_fields'] = $options['page_status_fields'];
+	$options['post_comment_status_fields'] = $options['page_comment_status_fields'];
+	$options['post_ping_status_fields']	= $options['page_ping_status_fields'];
+	
+	post_update($param,$options);
+} 
+
+#
+# THEME
+#
+
+function theme_list($param,$options){	
+	$options['section_data'] = get_themes();	
+	
+	$options['section_list_fields'] = $options['theme_list_fields'];
+	
+	if($options['theme_list_show_current']){
+		$options['section_list_extra'] = array('Title'=>array('value'=>get_current_theme(),'label'=>'ENABLED'));
+	}
+
+	section_list($param,$options);
+}
+
+function theme_info($param,$options){
+	
+	$param = trim($param);
+			
+	$options['section_info_fields'] = $options['theme_info_fields'];
+	$options['section_info_not_param_msg'] = "Please insert the mandatory(*) parameters: <*theme title/name>\n";	
+	$options['section_info_not_found_msg'] = "There is no theme with the title/name '".$param."'. Please insert a valid theme title/name.\n";
+	
+	if($options['theme_list_show_current']){
+		$options['section_list_extra'] = array('Title'=>array('value'=>get_current_theme(), 'label'=>'ENABLED'));
+	}
+
+	if($param){
+		$options['section_data'] = theme_find($param);
+
+		if($options['section_data']){	
+			section_info($param,$options);
+		}else{
+			echo $options['section_info_not_found_msg'];
+		}
+	}else{
+		echo $options['section_info_not_param_msg'];			
+	}	
+}
+
+function theme_install($param,$options){
+	$param = trim($param);
+	
+	check_write_permissions('theme');
+
+	if($param){
+		$options['section_data'] = theme_find($param);
+	
+		if(!$options['section_data']){	
+			$api = themes_api('theme_information',array('slug'=>$param,
+														'fields'=>array('sections' => false))); //Save on a bit of bandwidth.
+			
+			if (!is_wp_error($api)){   
+				echo "Please Wait\n";
+				$installer_skin = new Theme_Installer_Skin( compact('title','url','nonce','plugin','api'));
+				
+				//Prevents the displays of a few html messages during the theme install
+				$installer_skin->done_header = true;			
+
+				$upgrader = new Theme_Upgrader($installer_skin);
+
+				ob_start(); //disables output
+				$result = $upgrader->install($api->download_link);
+				ob_end_clean(); //eanbles output
+		
+				if(is_bool($result)){
+					echo "\nTheme Installed.\n";
+				}else{
+					echo "\nERROR: Theme not installed.\n";
+				}
+			}else{
+				if(isset($api->error_data["themes_api_failed"])){
+					echo "ERROR: ".$api->error_data["themes_api_failed"]."\n";
+				}
+			}
+		}else{
+			echo "The theme with the title/name '".$param."' alreay is installed.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*theme title/name>\n";			
+	}	
+}
+
+/****************** DUMMY FUNCTIONS/CLASSES *****************************
+Some are useless during the theme install and display html 
+messages, so we define them and also prevent from loading extra files  */
+function screen_icon(){ }
+function show_message(){ }
+function submit_button(){ return ''; }
+
+/***********************************************************************/
+
+//find specific theme in installed themes
+function theme_find($theme_name){
+	$theme_data = get_themes();
+	$theme_names = array_keys($theme_data);
+
+	$find_result = array_search_partial_needle($theme_name,array_map('strtolower',$theme_names),0,true);		
+		
+	if(is_bool($find_result)){
+		return false;
+	}else{
+		return $theme_data[$theme_names[$find_result]];
+	}
+}
+
+function theme_update($param,$options){
+	$param = trim($param);
+	
+	if($param){
+		$theme_data = theme_find($param,true);	
+
+		if($theme_data){	
+			$theme_name = $theme_data['Name'];	
+			$theme_id = $theme_data['Template'];	
+
+			check_write_permissions('theme',array($theme_data["Template Dir"])); 
+						
+			$installer_skin = new Theme_Upgrader_Skin(compact('title', 'nonce', 'url', 'theme'));
+			$installer_skin->done_header = true; //Prevents the displays of a few html messages
+			
+			$upgrader = new Theme_Upgrader($installer_skin);	
+
+			ob_start();
+			$result = $upgrader->upgrade($theme_id);			
+			ob_end_clean();
+
+			if($result){
+				echo "Theme '".$theme_name."' Updated.\n";
+			}else{
+				echo "Theme '".$theme_name."' not updated. Most likely the theme is alreay updated.\n";
+			}										
+		}else{
+			echo "There is no theme with the title/name '".$param."'. Please insert a valid theme title/name.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*theme title/name>\n";			
+	}			
+}
+
+function theme_update_all($param,$options){	
+	$themes_data = get_themes();
+	$theme_names = array_keys($themes_data);
+	
+	$theme_folders = array();
+	foreach($themes_data as $theme_data){
+		$theme_folders[]=$theme_data["Template Dir"];
+	}
+
+	check_write_permissions('theme',$theme_folders); 	
+
+	foreach($theme_names as $theme_name){
+		theme_update($theme_name,$options);
+	}		
+}
+
+#
+# PLUGIN
+#
+
+function plugin_list($param,$options){	
+	$options['section_data'] = get_plugins();	
+	$options['section_list_fields'] = $options['plugin_list_fields'];
+	
+	$active_plugins = array();
+	array_walk($options['section_data'], create_function('$val, $key, $obj', 'if(is_plugin_active($key)){ array_push($obj, $val["Name"]); }'), &$active_plugins);
+	
+	if($options['plugin_list_show_activated']){
+		$options['section_list_extra'] = array('Name'=>array('value'=>$active_plugins,'label'=>'ACTIVATED'));
+	}
+	
+	section_list($param,$options);
+}
+
+//find specific plugin in installed plugins list
+function plugin_find($plugin_name,$return_key=false){
+	$plugin_data = get_plugins();
+		
+	$plugin_names_files = array();
+	array_walk(get_plugins(), create_function('$val, $key, $obj', '$obj[$val["Name"]] = $key;'), &$plugin_names_files);
+	
+	$plugin_names = array_keys($plugin_names_files);
+
+	$find_result = array_search_partial_needle($plugin_name,array_map('strtolower',$plugin_names),0,true);		
+	
+	if(is_bool($find_result)){
+		return false;
+	}else{
+		if($return_key){
+			return $plugin_names_files[$plugin_names[$find_result]];
+		}else{
+			return $plugin_data[$plugin_names_files[$plugin_names[$find_result]]];
+		}
+	}
+}
+
+function plugin_info($param,$options){
+	$param = trim($param);
+	$plugin_data = get_plugins();
+			
+	$options['section_info_fields'] = $options['plugin_info_fields'];
+	$options['section_info_not_param_msg'] = "Please insert the mandatory(*) parameters: <*plugin title/name>\n";	
+	$options['section_info_not_found_msg'] = "There is no plugin with the title/name '".$param."'. Please insert a valid plugin title/name.\n";
+	
+	$active_plugins = array();
+	array_walk($plugin_data, create_function('$val, $key, $obj', 'if(is_plugin_active($key)){ array_push($obj, $val["Name"]); }'), &$active_plugins);
+	
+	if($options['plugin_list_show_activated']){
+		$options['section_list_extra'] = array('Name'=>array('value'=>$active_plugins,'label'=>'ACTIVATED'));
+	}
+	
+	$options['section_data'] = plugin_find($param);
+	
+	section_info($param,$options);
+}
+
+function plugin_install($param,$options){
+	$param = trim($param);
+
+	if($param){
+		check_write_permissions('plugin'); 	
+		$section_data = plugin_find($param,true);
+	
+		if(!$section_data){	
+			echo "Please Wait\n";
+			$api = plugins_api('plugin_information', array('slug' => stripslashes($param) ));
+			
+			$installer_skin = new Plugin_Installer_Skin( compact('title','url','nonce','plugin','api'));
+			$installer_skin->done_header = true;
+			
+			$upgrader = new Plugin_Upgrader($installer_skin);
+			
+			//DOES NOT RETURN VALUE LIKE THE theme_updater
+			ob_start();
+			$upgrader->install($api->download_link);
+			ob_end_clean();
+
+			if(file_exists($upgrader->result["remote_destination"])){
+				echo "Plugin Installed.\n";
+			}else{
+				echo "ERROR: Plugin Not Installed.\n";
+			}
+		}else{
+			echo "The plugin with the title/name '".$param."' alreay is installed.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*plugin title/name>\n";			
+	}	
+}
+
+function plugin_update($param,$options){
+	$param = trim($param);
+	
+	if($param){
+		$plugin_data = plugin_find($param);
+		$plugin_id = plugin_find($param,true);	
+		
+		if($plugin_data){	
+			$plugin_name = $plugin_data['Name'];
+	
+			$installer_skin = new WP_Upgrader_Skin(compact('title', 'nonce', 'url', 'plugin'));
+			$installer_skin->done_header = true; //Prevents the displays of a few html messages
+			$upgrader = new Plugin_Upgrader($installer_skin);			
+			
+			ob_start();
+			$result = $upgrader->upgrade($plugin_id);			
+			ob_end_clean();
+			
+			if(is_null($result)){
+				echo "Plugin '".$plugin_name."' Updated.\n";
+			}else if(is_bool($result)){
+				echo "Plugin '".$plugin_name."' not updated. Most likely the plugin is alreay updated.\n";
+			}	
+										
+		}else{
+			echo "There is no plugin with the title/name '".$param."'. Please insert a valid plugin title/name.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*plugin title/name>\n";			
+	}			
+}
+
+function plugin_update_all($param,$options){	
+	$plugin_names = array();
+	array_walk(get_plugins(), create_function('$val, $key, $obj', '$obj[] = $val["Name"];'), &$plugin_names);
+	
+	foreach($plugin_names as $plugin_name){
+		plugin_update($plugin_name,$options);
+	}		
+}
+
+#
+# UTILS
+#
+
+function set_folder_recursive_permissions($folder=null,$options){
+	if(posix_getuid()!=0){
+		echo "You need to be root in order to change file/folder permissions. No permissions will be changed.\n";
+	}else{
+		$file_dir_list = array_flatten_recursive(scan_directory_recursively($folder));
+	
+		if(empty($options['web_user'])){
+			echo "No web user specified in the script. The owner of files/folder will not be changed.\n";
+		}
+		if(empty($options['web_group'])){
+			echo "No web group specified in the script. The group owner of files/folder will not be changed.\n";
+		}
+			
+		echo "Setting permissions for folder (".$options['folder_permissions'].") and files (".$options['file_permissions']."): ";
+		
+		try {
+			foreach($file_dir_list as $item){
+				if(is_dir($item)){
+					set_permissions($item,$options['folder_permissions'],$options);
+				}else{
+					set_permissions($item,$options['file_permissions'],$options);
+				}
+			}
+		} catch (Exception $e) {
+			echo "ERROR exception: ".$e->getMessage()."\n";
+		}
+		echo "DONE\n";
+	}
+}
+
+#
+# GENERIC FUNCTIONS, USED BY MORE THAN 1 SECTION (THEMES/PLUGINS)
+#
+
+function section_search($param,$options,$section_name='plugin'){
+	
+	$param = explode($options['field_value_separator'],trim($param));
+	$args = array( 'page' => 1, 'per_page' => 5 );
+	
+	if(count($param) > 1){
+		switch(strtolower(trim($param[0]))){	
+			case 'term': 
+				$args['search'] = trim($param[1]);
+			break;
+			case 'author': 
+				$args['author'] = trim($param[1]); 
+			break;
+			case 'tag': 
+				$terms = explode($options['multiple_values_separator'], trim($param[1]));
+				$terms = array_map( 'trim', $terms );
+				$terms = array_map( 'sanitize_title_with_dashes', $terms );
+				$args['tag'] = $terms;
+			break;
+			default: 
+				echo "Please insert: 'tag', 'term' or 'author' followed by search term.\n";			
+				exit;
+			break;
+		}
+						
+		switch($section_name){	
+			case 'plugin':
+				$args['per_page'] = $options['plugin_search_num_result'];
+			
+				$query_result = objectToArray(plugins_api('query_plugins',$args)->plugins);
+		
+				$options['section_info_fields'] = $options['plugin_search_fields'];
+			break;
+			case 'theme':
+				$args['fields'] = array('description'=>true,'sections'=>false,'tested'=>true, 
+										'requires'=>true,'rating'=>true,'downloaded'=>true, 
+										'downloadlink' => true, 'last_updated' => true, 
+										'homepage' => true,'tags'=>true,'num_ratings'=>true);	
+				
+				$args['per_page'] = $options['theme_search_num_result'];
+							  	
+				$query_result = objectToArray(themes_api('query_themes',$args)->themes);	
+
+				$options['section_info_fields'] = $options['theme_search_fields'];			
+			
+			break;
+			default: 
+				return; 
+			break;
+		}						 
+		 
+		$options['section_info_not_param_msg'] = "";	
+		$options['section_info_not_found_msg'] = "";		
+		
+		foreach($query_result as $query_result_data){
+			$options['section_data'] = $query_result_data;
+			section_info(" ",$options);
+			echo "\n";
+		}
+	}else{
+		echo "Please insert 1 set of mandatory(*) parameters:\n";
+		echo "(*)term".$options['field_value_separator']."<*term>\n";			
+		echo "(*)tag".$options['field_value_separator']."<*tag>\n";		
+		echo "(*)author".$options['field_value_separator']."<*author>\n";				
+	}	
+}
+
+function section_delete($param,$options,$section_name="theme"){
+	$param = trim($param);
+
+	if($param){
+		switch($section_name){	
+			case 'theme': $section_data = theme_find($param); break;
+			case 'plugin': $section_data = plugin_find($param,true); break;
+		}
+
+		if($section_data){		
+			switch($section_name){	
+				case 'theme': 	
+					check_write_permissions('theme',array($section_data["Template Dir"])); 
+					$result = @delete_theme($section_data['Template']); 
+					break;
+				case 'plugin': 
+					$folder = explode("/",$section_data);
+					check_write_permissions('plugin',array(ABSPATH."wp-content/plugins/".$folder[0])); 
+					$result = delete_plugins(array($section_data)); 
+					break;
+				break;
+			}
+			if($result){
+				echo $section_name." deleted\n";
+			}else{
+				echo "ERROR: ".$section_name." not deleted\n";
+			}	
+		}else{
+			echo "There is no ".$section_name." with the title/name '".$param."'. Please insert a valid ".$section_name." title/name.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*".$section_name." title/name>\n";			
+	}	
+}
+
+function section_change_status($param,$options,$section_name="theme",$section_status=true){	
+	$param = trim($param);
+	
+	if($param){
+		switch($section_name){	
+			case 'theme': $section_data = theme_find($param); break;
+			case 'plugin': $section_data = plugin_find($param,true); break;
+		}
+		if($section_data){	
+			switch($section_name){	
+				case 'theme': 
+					@switch_theme($section_data['Template'], $section_data['Stylesheet']); 
+				break;
+				case 'plugin': 
+					if($section_status){
+						@activate_plugin($section_data);
+					}else{
+						@deactivate_plugins($section_data);
+					}
+				break;
+			}
+			echo "DONE.\n";			
+		}else{
+			echo "There is no ".$section_name." with the title/name '".$param."'. Please insert a valid ".$section_name." title/name.\n";		
+		}
+	}else{
+		echo "Please insert the mandatory(*) parameters: <*".$section_name." title/name>\n";			
+	}		
+}
+
+function section_list($param,$options){	
+	foreach($options['section_data'] as $data){
+		$line = "";
+		foreach($options['section_list_fields'] as $field){
+			if(isset($data[$field])){
+				 if(is_array($data[$field])){
+					$line .= strtoupper($field).": ".implode(", ",$data[$field])." - ";
+				}else{	
+					$line .= strtoupper($field).": ".$data[$field]." - ";
+				}				
+			}
+		}
+		if(isset($options['section_list_extra'])){
+			foreach($options['section_list_extra'] as $field_name => $field_data){
+				if(is_array($field_data['value'])){
+					if(in_array($data[$field_name],$field_data['value'])){
+						$line .= strtoupper($field_data['label']).": 1 - ";
+					}else{
+						$line .= strtoupper($field_data['label']).": 0 - ";
+					}					
+				}else{
+					if($data[$field_name] == $field_data['value']){
+						$line .= strtoupper($field_data['label']).": 1 - ";
+					}else{
+						$line .= strtoupper($field_data['label']).": 0 - ";
+					}
+				}
+			}
+		}
+		echo substr($line,0,strlen($line)-2)."\n";
+	}
+}
+
+function section_info($param,$options){	
+
+	if(strlen($param)){
+		if($options['section_data']){			
+			foreach($options['section_info_fields'] as $field){
+				 if(is_array($options['section_data'][$field])){	 
+					 if(array_level($options['section_data'][$field]) == 1){	
+						 if(is_assoc_array($options['section_data'][$field]) == 1){
+							 echo strtoupper($field).": ".assoc_implode(", ",$options['section_data'][$field])."\n";
+						 }else{
+							 echo strtoupper($field).": ".implode(", ",$options['section_data'][$field])."\n";
+						 }
+					 }else{
+						 echo strtoupper($field).": ".ltrim(plot_array_tree($options['section_data'][$field],0,true,'',strlen($field)+2))."";
+					 }
+				}else{	
+					echo strtoupper($field).": ".$options['section_data'][$field]."\n";
+				}					
+			}	
+			if(isset($options['section_list_extra'])){
+				foreach($options['section_list_extra'] as $field_name => $field_data){
+					if(is_array($field_data['value'])){
+						if(in_array($options['section_data'][$field_name],$field_data['value'])){
+							echo strtoupper($field_data['label']).": 1\n";
+						}else{
+							echo strtoupper($field_data['label']).": 0\n";
+						}						
+					}else{
+						if($options['section_data'][$field_name] == $field_data['value']){
+							echo strtoupper($field_data['label']).": 1\n";
+						}else{
+							echo strtoupper($field_data['label']).": 0\n";
+						}
+					}
+				}
+			}									
+		}else{
+			echo $options['section_info_not_found_msg'];		
+		}
+	}else{
+		echo $options['section_info_not_param_msg'];			
+	}	
+}
+
+
+#
+# AUXILIAR FUNCTIONS
+#
+
+function check_installation($options){
+	if (file_exists($options['root_folder']."wp-load.php") &&  is_readable($options['root_folder']."wp-load.php")){
+		return true;
+	}else{
+		echo "No wordpress installation detected. Please verify the current directory.\n";
+	}
+	exit;
+}
+
+function check_permissions($options,$file_folder="wp-config.php"){
+	if(is_writable($options['root_folder'].$file_folder)){
+		return true;
+	}else{
+		echo "Either file/folder ".$options['root_folder'].$file_folder." doesn't exist or you don't have write permission.\n";
+	}
+	exit;
+}
+
+function check_write_permissions($section,$extra_files_dir=array()){
+
+	if(posix_getuid()==0){
+		echo "You cannot be root when running this command. Change to another user.\n";
+		exit;
+	}else{
+		$current_user = posix_getpwuid(posix_geteuid()); $current_user = $current_user['name'];
+
+		$folders_to_check = array(ABSPATH.'wp-content/',ABSPATH.'wp-content/upgrade/',ABSPATH.'wp-content/'.$section.'s/');	
+		$folders_to_check = array_merge($folders_to_check,$extra_files_dir);
+
+		$folder_permissions = array();
+		foreach($folders_to_check as $folder){
+			$folder_data = posix_getpwuid(@fileowner($folder)); 			
+			$folder_permissions[$folder] = $folder_data['name'];
+		}
+		
+		$folder_permissions_string = implode("",array_unique(array_values($folder_permissions)));
+
+		if($folder_permissions_string != $current_user){
+			echo "\nThe following folders must have the current user '".$current_user."' as the owner.\n\n";
+		
+			foreach($folder_permissions as $folder_name=>$user_owner){
+				echo $folder_name." - current owner: ".$user_owner."\n";
+			}
+			echo "\n";
+			exit;
+		}
+	}
+}
+
+
+
+function set_permissions($file_folder=null,$permissions=null,$options){
+	if(!is_null($file_folder)){
+		if(!empty($options['web_user'])){
+			if(posix_getuid()==0){
+				chown($file_folder,$options['web_user']);
+			}else{
+				echo "You need to be root in order to set the user owner of the files\n";
+			}
+		}
+		if(!empty($options['web_group'])){
+			if(posix_getuid()==0){
+				chgrp($file_folder,$options['web_group']);
+			}else{
+				echo "You need to be root in order to set the group owner of the files\n";
+			}			
+		}
+		if(!is_null($permissions)){
+			chmod($file_folder, octdec($permissions)); 
+		}
+	}
+}
+
+function array_level($arr,$level=1){
+	if(is_array($arr)){
+		foreach($arr as $value){
+			if(is_array($value)){
+				$level = array_level($value,$level+1);
+			}	
+		}
+	}
+	return $level;
+}
+
+// FROM: http://kevin.vanzonneveld.net/techblog/article/convert_anything_to_tree_structures_in_php/
+function plot_array_tree($arr, $indent=0, $mother_run=true,$tree_string='',$spacing=0){
+    if($mother_run){ /* echo "start\n"; */ }
+    
+    $tree_string = '';
+    
+    foreach($arr as $k=>$v){
+		for($j=0;$j<$spacing;$j++){ $tree_string.= " "; }
+        
+        $tree_string.= str_repeat("  ", $indent);
+        
+        if($indent == 0){
+            $tree_string.= "> ";
+        } elseif(is_array($v)){
+            $tree_string.= "+ ";
+        } else{
+            $tree_string.= "- ";
+        }
+   	    
+        if(is_array($v)){
+			$tree_string.= $k."\n";
+            $tree_string.= plot_array_tree($v, ($indent+1), false,$tree_string,$spacing);
+        }else{
+			$tree_string.= $v."\n";
+		}
+    }
+	
+    if($mother_run){ /* echo "end\n"; */ }
+    return $tree_string;
+}
+
+// FROM: http://stackoverflow.com/questions/2625370/determine-if-a-php-array-uses-keys-or-indices
+function is_assoc_array($arr){ 
+	return array_keys($arr) !== range(0, count($arr) - 1); 
+}
+
+function assoc_implode($glue=", ",$arr=null,$trim=true,$key_prefix="",$key_suffix="",$value_prefix=" (",$value_suffix=") "){
+	if(is_assoc_array($arr) && array_level($arr)==1 && !is_null($arr)){
+		$pieces = array();
+		foreach($arr as $key=>$value){
+			if($trim){
+				$pieces[] = trim($key_prefix.$key.$key_suffix.$value_prefix.$value.$value_suffix);
+			}else{
+				$pieces[] = $key_prefix.$key.$key_suffix.$value_prefix.$value.$value_suffix;
+			}
+		}
+		return implode($glue,$pieces);
+	}
+	return null;
+}
+
+//FROM: http://pt2.php.net/manual/en/function.array-search.php
+function array_search_partial_needle($needle = null, $haystack_array = null, $skip = 0, $return_key = false){
+    if($needle == null || $haystack_array == null)
+        die('$needle and $haystack_array are mandatory for functie array_search_partial_needle()');
+    foreach($haystack_array as $key => $eval){
+        if($skip != 0){ $eval = substr($eval, $skip); }
+        if(stristr($eval, $needle) !== false){ 
+			if($return_key){
+				return $key; 
+			}else{
+				return true;
+			}
+		}
+    }
+    return false;
+}
+
+function unzip_files($filename, $options){
+	$zip = zip_open($options['root_folder'].$filename);
+	if(is_resource($zip)) {
+	  while ($zip_entry = zip_read($zip)) {
+		if(strpos(zip_entry_name($zip_entry), '.')){
+			$fp = @fopen($options['root_folder'].zip_entry_name($zip_entry), "w");
+			if (zip_entry_open($zip, $zip_entry, "r")) {
+			  $buf = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+			  @fwrite($fp,"$buf");
+			  zip_entry_close($zip_entry);
+			  @fclose($fp);
+			  set_permissions($options['root_folder'].zip_entry_name($zip_entry),$options['file_permissions'],$options);
+			}
+		}else{
+			@mkdir($options['root_folder'].zip_entry_name($zip_entry));
+		    set_permissions($options['root_folder'].zip_entry_name($zip_entry),$options['folder_permissions'],$options);
+		}
+		
+	  }
+	  zip_close($zip);
+	}
+}
+
+//FROM: http://lixlpixel.org/recursive_function/php/recursive_directory_scan/
+function scan_directory_recursively($directory, $filter=FALSE){
+	if(empty($directory)){
+		$directory=".";
+	}
+
+	if(substr($directory,-1) == '/'){
+		$directory = substr($directory,0,-1);
+	}
+	
+	if(!file_exists($directory) || !is_dir($directory)){
+		return FALSE;
+	}elseif(is_readable($directory)){
+		$directory_list = opendir($directory);
+		while($file = readdir($directory_list)){
+			if($file != '.' && $file != '..'){
+				$path = $directory.'/'.$file;
+				if(is_readable($path)){
+					$subdirectories = explode('/',$path);
+					if(is_dir($path)){
+						$directory_tree[] = array($path,scan_directory_recursively($path, $filter));
+					}elseif(is_file($path)){
+						$extension = end(explode('.',end($subdirectories)));
+						if($filter === FALSE || $filter == $extension){
+							//$directory_tree[] = str_replace("./","",$path);
+							$directory_tree[] = $path;
+				
+						}
+					}
+				}
+			}
+		}
+		closedir($directory_list); 
+		return @$directory_tree;
+	}else{
+		return FALSE;	
+	}
+}
+
+function array_flatten_recursive($array) {
+    if($array) {
+        $flat = array();
+        foreach($array as $key=>$value) {
+            if(!is_array($value)) {
+                $flat[] = $value;
+            }else{
+				$flat = array_merge($flat,array_flatten_recursive($value));
+			}
+        }
+        return $flat;
+    } else {
+        return false;
+    }
+} 
+
+function objectToArray($object){
+	if(!is_object($object) && !is_array($object)){
+		return $object;
+	}
+	
+	if(is_object($object)){
+		$object = get_object_vars( $object );
+	}
+	
+	return array_map('objectToArray',$object);
+}
+
+?>
